@@ -8,40 +8,32 @@ function LoginPage() {
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState("");
-
-    // const handleLogin = (e) => {
-    //     e.preventDefault();
-    //     console.log('Logging in with', email, password);
-    //     // You can add your login logic here
-    // };
+    const [error, setError] = useState('');
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError("");
-
+    
         try {
-            const res = await fetch("/api/login", {
+            const res = await fetch("http://localhost:5000/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email: email, password }),
             });
-
+    
             const data = await res.json();
-
+    
             if (res.ok) {
-                // Save the JWT token
                 localStorage.setItem("token", data.token);
-
-                // Redirect to dashboard
                 router.push("/dashboard");
             } else {
                 setError(data.message || "Login failed");
             }
         } catch (err) {
-            setError("Something went wrong");
+            console.log(JSON.stringify(err.message));
+            setError("Something went wrong: " + JSON.stringify(err.message));
         }
-    };
+    };    
 
     return (
         <div className="login-container">

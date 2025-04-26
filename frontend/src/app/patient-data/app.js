@@ -6,22 +6,33 @@ import { useRouter } from 'next/navigation';
 
 export default function VaccineDashboard() {
     const router = useRouter();
-    const [vaccines, setVaccines] = useState([]);
+    const [vaccines, setPatientsData] = useState([]);
 
     useEffect(() => {
-        const fetchVaccines = async () => {
+        const fetchPatientData = async () => {
             try {
-                const res = await axios.get('https://jsonplaceholder.typicode.com/todos');
-                setVaccines(res.data);
+                const res = await axios.get('https://localhost/patient-data');
+                setPatientsData(res.data);
             } catch (err) {
                 console.error(err);
             }
         };
-        fetchVaccines();
+        fetchPatientData();
     }, []);
 
+    const handleReportVaccine = async (vaccineId) => {
+        // try {
+        //     await axios.patch(`https://localhost/patient-data`);
+        //     setPatientsData(vaccines.map(v =>
+        //         v._id === vaccineId ? { ...v, status: 'pending-verification' } : v
+        //     ));
+        // } catch (err) {
+        //     console.error(err);
+        // }
+    };
+
     const handleLoginClick = () => {
-        router.naigate("/login")
+        router.push('/login');
     }
 
     return (
@@ -29,9 +40,15 @@ export default function VaccineDashboard() {
            
             <div className="vaccine-list">
                 {vaccines.map(vaccine => (
-                    <div key={vaccine._id} className={`vaccine-card`}>
-                        <h3>{vaccine.title}</h3>
-                        <p>Status: {vaccine.completed}</p>
+                    <div key={vaccine._id} className={`vaccine-card ${vaccine.status}`}>
+                        <h3>{vaccine.name}</h3>
+                        <p>Scheduled: {new Date(vaccine.dateScheduled).toLocaleDateString()}</p>
+                        <p>Status: {vaccine.status}</p>
+                        {vaccine.status === 'scheduled' && (
+                            <button onClick={() => handleReportVaccine(vaccine._id)}>
+                                Report Completed
+                            </button>
+                        )}
                     </div>
                 ))}
             </div>

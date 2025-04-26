@@ -6,6 +6,21 @@ import { useRouter } from "next/navigation";
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const [patientsData, setPatientsData] = useState([]);
+
+  const fetchPatientData = async () => {
+    try {
+      const response = await axios.get('/api/patient-data');
+      if (response.data.success) {
+        setPatientsData(response.data.patientInfo)
+        // Use response.data.patientInfo
+        // Use response.data.vaccineRecords
+        // Use response.data.summary
+      }
+    } catch (error) {
+      alert(error.response.data.message)
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -13,11 +28,15 @@ export default function Dashboard() {
     if (!token) {
       router.push("/login");
     } else {
-      // Optionally: decode token to show user info
       const userInfo = JSON.parse(atob(token.split('.')[1]));
       setUser(userInfo);
     }
+
+    fetchPatientData()
   }, []);
+
+  console.log("\n\n patientsData: ", patientsData);
+  
 
   if (!user) return <div>Loading...</div>;
 

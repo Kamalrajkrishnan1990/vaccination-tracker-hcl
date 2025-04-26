@@ -1,5 +1,5 @@
+// backend/models/User.js
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
@@ -7,17 +7,17 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['patient', 'provider'], required: true },
   profile: {
     fullName: String,
-    allergies: [String],
-    medicalHistory: String,
-    phone: String
+    phone: String,
+    // Additional fields based on role
+    ...(this.role === 'patient' && {
+      allergies: [String],
+      medicalHistory: String
+    }),
+    ...(this.role === 'provider' && {
+      licenseNumber: String,
+      specialization: String
+    })
   }
-});
-
-userSchema.pre('save', async function(next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
 });
 
 module.exports = mongoose.model('User', userSchema);
